@@ -820,6 +820,7 @@ namespace perceptron_web_beeline
                                 pictureBox1.Image = Image.FromFile(file);
                                 AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y);
                                 pictureBox1.Dispose();
+                                pictureBox1.Dispose();
                             }
                         }
                     }
