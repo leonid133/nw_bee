@@ -38,6 +38,7 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button_NeyroActivate = new System.Windows.Forms.Button();
             this.button_AutoTrain = new System.Windows.Forms.Button();
+            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -134,11 +135,29 @@
             this.button_AutoTrain.UseVisualStyleBackColor = true;
             this.button_AutoTrain.Click += new System.EventHandler(this.button_AutoTrain_Click);
             // 
+            // checkedListBox1
+            // 
+            this.checkedListBox1.FormattingEnabled = true;
+            this.checkedListBox1.Items.AddRange(new object[] {
+            "w0",
+            "w1",
+            "w2",
+            "w3",
+            "w4",
+            "w5",
+            "w6",
+            "w7"});
+            this.checkedListBox1.Location = new System.Drawing.Point(511, 15);
+            this.checkedListBox1.Name = "checkedListBox1";
+            this.checkedListBox1.Size = new System.Drawing.Size(53, 140);
+            this.checkedListBox1.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(539, 461);
+            this.ClientSize = new System.Drawing.Size(575, 461);
+            this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.button_AutoTrain);
             this.Controls.Add(this.button_NeyroActivate);
             this.Controls.Add(this.button2);
@@ -167,6 +186,7 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button_NeyroActivate;
         private System.Windows.Forms.Button button_AutoTrain;
+        private System.Windows.Forms.CheckedListBox checkedListBox1;
     }
 }
 

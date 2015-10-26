@@ -719,19 +719,21 @@ namespace perceptron_web_beeline
 
             
             //***********
-            Bitmap im = pictureBox1.Image as Bitmap;
+            Bitmap image_x = pictureBox1.Image as Bitmap;
 
             for (var x = 0; x < m_max_x_62; x++)
             {
                 for (var y = 0; y < max_y; y++)
                 {
-                    int n = (im.GetPixel(x, y).R);
+                    int n = (image_x.GetPixel(x, y).R);
                     if (n >= 250) n = 0;
                     else n = 1;
                     input[x, y] = n;
                 }
 
             }
+            image_x.Dispose();
+
             neyron.mul_w();
             neyron.Sum();
             if ((neyron.Rez() && !train_to_this) || (!neyron.Rez() && train_to_this))
@@ -794,13 +796,16 @@ namespace perceptron_web_beeline
                 {
                     for (int it_w = 0; it_w < 8; ++it_w)
                     {
-                        int it_file = 0;
-                        foreach (string file in openFileDialog1.FileNames)
+                        if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                         {
-                            //listBox1.Items.Add(file);
-                            m_w_file = "w" + it_w.ToString();
-                            pictureBox1.Image = Image.FromFile(file);
-                            AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y, y_dictonary, x_dictonary);
+                            int it_file = 0;
+                            foreach (string file in openFileDialog1.FileNames)
+                            {
+                                //listBox1.Items.Add(file);
+                                m_w_file = "w" + it_w.ToString();
+                                pictureBox1.Image = Image.FromFile(file);
+                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y, y_dictonary, x_dictonary);
+                            }
                         }
                     }
                 }
