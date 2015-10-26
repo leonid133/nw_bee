@@ -40,6 +40,7 @@
             this.button_AutoTrain = new System.Windows.Forms.Button();
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.button_CreateTestBMP = new System.Windows.Forms.Button();
+            this.button_answer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -156,11 +157,22 @@
             this.button_CreateTestBMP.UseVisualStyleBackColor = true;
             this.button_CreateTestBMP.Click += new System.EventHandler(this.button_CreateTestBMP_Click);
             // 
+            // button_answer
+            // 
+            this.button_answer.Location = new System.Drawing.Point(203, 71);
+            this.button_answer.Name = "button_answer";
+            this.button_answer.Size = new System.Drawing.Size(75, 23);
+            this.button_answer.TabIndex = 11;
+            this.button_answer.Text = "Answer";
+            this.button_answer.UseVisualStyleBackColor = true;
+            this.button_answer.Click += new System.EventHandler(this.button_answer_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(437, 375);
+            this.Controls.Add(this.button_answer);
             this.Controls.Add(this.button_CreateTestBMP);
             this.Controls.Add(this.checkedListBox1);
             this.Controls.Add(this.button_AutoTrain);
@@ -192,6 +204,7 @@
         private System.Windows.Forms.Button button_AutoTrain;
         private System.Windows.Forms.CheckedListBox checkedListBox1;
         private System.Windows.Forms.Button button_CreateTestBMP;
+        private System.Windows.Forms.Button button_answer;
     }
 }
 

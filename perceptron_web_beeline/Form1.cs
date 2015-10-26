@@ -23,7 +23,7 @@ namespace perceptron_web_beeline
 
         public string m_w_file;
         public int m_max_x_62 = 62;
-
+        public int m_max_id = 50000;
         public Form1()
         {
             InitializeComponent();
@@ -958,6 +958,171 @@ namespace perceptron_web_beeline
                     ++line_counter;
                 }
             }
+        }
+        private void AutoAnswer(int it_w, out bool rez, out int sum, int max_y)
+        {
+
+            int[,] input = new int[m_max_x_62, max_y];
+            Web_perceptron neyron = new Web_perceptron(m_max_x_62, max_y, input);
+
+            //*********************
+            string line_read_weight_buffer;
+            string[] str_weight_read_buffer = new string[max_y];
+            int it_weight_y = 0;
+            StreamReader sr_weight = File.OpenText(m_w_file);  // Загружаем файл весов
+            try
+            {
+                while ((line_read_weight_buffer = sr_weight.ReadLine()) != null)
+                {
+
+                    str_weight_read_buffer = line_read_weight_buffer.Split(' ');
+                    for (int it_weight_x = 0; it_weight_x < m_max_x_62; it_weight_x++)
+                    {
+                        //listBox1.Items.Add("");
+                        if (it_weight_y < max_y)
+                        {
+                            neyron.m_weight[it_weight_x, it_weight_y] = Convert.ToInt32(str_weight_read_buffer[it_weight_x]); // Назначаем каждой связи её записанный ранее вес
+                            //listBox1.Items[k] += Convert.ToString(neyron.m_weight[i, k]); // Выводим веса, для наглядности
+                        }
+
+                    }
+                    it_weight_y++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sr_weight.Close();
+            }
+            //*********************
+
+           
+            Bitmap image_x = pictureBox1.Image as Bitmap;
+
+            for (var x = 0; x < m_max_x_62; x++)
+            {
+                for (var y = 0; y < max_y; y++)
+                {
+                    int n = 255;
+                    if (image_x.Width >= x && image_x.Height >= y)
+                        n = (image_x.GetPixel(x, y).R);
+                    if (n >= 250) n = 0;
+                    else n = 1;
+                    input[x, y] = n;
+                }
+
+            }
+            image_x.Dispose();
+
+            neyron.mul_w();
+            neyron.Sum();
+            rez = neyron.Rez();
+            sum = neyron.m_sum;
+            //***********
+        }
+        private void button_answer_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "bmp files (*.bmp)|*.bmp|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 2;
+            openFileDialog1.RestoreDirectory = true;
+            openFileDialog1.Multiselect = true;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Dictonary_train y_dictonary = new Dictonary_train("y");
+                int x_count = 62;
+                List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+                int max_y = 0;
+                for (int it_x = 0; it_x < x_count; ++it_x)
+                {
+                    string f_name = "x" + it_x.ToString();
+                    x_dictonary.Add(new Dictonary_train(f_name));
+                    if (x_dictonary[it_x].Count() > max_y)
+                        max_y = x_dictonary[it_x].Count();
+                }
+                try
+                {
+                    List<int> rez_nw_list = new List<int>();
+                    for (int i = 0; i < m_max_id; ++i)
+                    {
+                        rez_nw_list.Add(0);                          
+                    }
+                    
+                       
+                    int it_file = 0;
+                    foreach (string file in openFileDialog1.FileNames)
+                    {
+                        //***********
+                        char[] bmp_filename_charSeparators = new char[] { '_' };
+                        string name_bmp = openFileDialog1.SafeFileNames[it_file++].ToString();
+                        string[] result_split_bmp = name_bmp.Split(bmp_filename_charSeparators, StringSplitOptions.None);
+                        int bmp_file_preffix = 0;
+                        int bmp_file_suffix = 0;
+                        for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
+                        {
+
+                            try
+                            {
+                                if (it_bmp_split_name == 0)
+                                    bmp_file_preffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
+                                else if (it_bmp_split_name == 2)
+                                    bmp_file_suffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
+                            }
+                            catch { }
+                        }
+
+                        //***********
+                        //listBox1.Items.Add(file);
+                                
+                        pictureBox1.Image = Image.FromFile(file);
+                        int[] all_sum = new int[8]; 
+
+                        for (int it_w = 0; it_w < 6; ++it_w)
+                        {
+                            all_sum[it_w] = 0;
+                            m_w_file = "w" + it_w.ToString();
+                                    
+                            bool rez = false;
+                            int sum = 0;
+                            AutoAnswer( max_y, out rez, out sum, max_y);
+                            if (rez)
+                                all_sum[it_w] = sum;
+                        }
+                        pictureBox1.Dispose();
+                        int maxsum = 0;
+                        int answer = 8;
+                        for (int it_w = 0; it_w < 8; ++it_w)
+                        {
+                            if (all_sum[it_w] > maxsum)
+                            {
+                                maxsum = all_sum[it_w];
+                                answer = it_w;
+                            }
+                        }
+                        rez_nw_list[bmp_file_suffix] = answer;
+                    }
+                    string name_answer_file = "sol";
+                    openFileDialog1.Multiselect = false;
+                    System.IO.File.Delete(name_answer_file);
+                    FileStream FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
+                    StreamWriter SW = new StreamWriter(FS);
+
+                    for (int it_id = 0; it_id < m_max_id; it_id++)
+                    {
+                        string s = it_id + "," + rez_nw_list[it_id]; 
+                        SW.WriteLine(s);
+                    }
+                    SW.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+            }
+
+            MessageBox.Show("Auto train success!");
         }
 
     }
