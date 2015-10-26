@@ -24,6 +24,8 @@ namespace perceptron_web_beeline
         public string m_w_file;
         public int m_max_x_62 = 62;
         public int m_max_id = 50000;
+        public int m_W_count = 7;
+
         public Form1()
         {
             InitializeComponent();
@@ -813,8 +815,8 @@ namespace perceptron_web_beeline
                     {
                         pictureBox1.Image = Image.FromFile(file);
                         //listBox1.Items.Add(file);
-                            
-                        for (int it_w = 0; it_w < 8; ++it_w)
+
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
                             if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                             {
@@ -1062,7 +1064,6 @@ namespace perceptron_web_beeline
                         int bmp_file_suffix = 0;
                         for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
                         {
-
                             try
                             {
                                 if (it_bmp_split_name == 0)
@@ -1079,7 +1080,7 @@ namespace perceptron_web_beeline
                         pictureBox1.Image = Image.FromFile(file);
                         int[] all_sum = new int[8]; 
 
-                        for (int it_w = 0; it_w < 6; ++it_w)
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
                             all_sum[it_w] = 0;
                             m_w_file = "w" + it_w.ToString();
@@ -1093,7 +1094,7 @@ namespace perceptron_web_beeline
                         pictureBox1.Dispose();
                         int maxsum = 0;
                         int answer = 8;
-                        for (int it_w = 0; it_w < 8; ++it_w)
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
                             if (all_sum[it_w] > maxsum)
                             {
