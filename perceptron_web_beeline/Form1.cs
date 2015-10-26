@@ -18,9 +18,11 @@ namespace perceptron_web_beeline
 
     public partial class Form1 : Form
     {
-        Web_perceptron m_Neyron;
-        public int[,] m_input = new int[63, 349];
+        Web_perceptron g_Neyron;
+        public int[,] g_input = new int[63, 349];
+
         public string m_w_file;
+        public int m_max_x_62 = 62;
 
         public Form1()
         {
@@ -59,18 +61,158 @@ namespace perceptron_web_beeline
             sr.Close();
              * */
         }
-        public bool recognize()
+        private void g_PunishNeyron()
         {
-            m_Neyron.mul_w();
-            m_Neyron.Sum();
-            if (m_Neyron.Rez()) listBox1.Items.Add(" - True, Sum = " + Convert.ToString(m_Neyron.m_sum));
-            else listBox1.Items.Add(" - False, Sum = " + Convert.ToString(m_Neyron.m_sum));
-            return m_Neyron.Rez();
+            button_train.Enabled = false;
+
+            if (g_Neyron.Rez() == false)
+                g_Neyron.incW(g_input);
+            else g_Neyron.decW(g_input);
+
+            //Запись
+            string s = "";
+
+            System.IO.File.Delete(m_w_file);
+            FileStream FS = new FileStream(m_w_file, FileMode.OpenOrCreate);
+            StreamWriter SW = new StreamWriter(FS);
+
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+
+            Dictonary_train[] x_dictonary = new Dictonary_train[m_max_x_62];
+            int max_y = 0;
+            for (int it_x = 0; it_x < m_max_x_62; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary[it_x] = new Dictonary_train(f_name);
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+
+            string[] s1 = new string[max_y];
+            for (int y = 0; y < max_y; y++)
+            {
+
+                for (var x = 0; x < m_max_x_62; x++)
+                {
+                    s += Convert.ToString(g_Neyron.m_weight[x, y]);
+                    if (x != m_max_x_62) s += " ";
+                }
+
+                s1[y] = s;
+
+                SW.WriteLine(s);
+                s = "";
+
+            }
+            SW.Close();
+        }
+        private void g_NW_Activate()
+        {
+            button_train.Enabled = true;
+
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+
+            Dictonary_train[] x_dictonary = new Dictonary_train[m_max_x_62];
+            int max_y = 0;
+            for (int it_x = 0; it_x < m_max_x_62; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary[it_x] = new Dictonary_train(f_name);
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+            g_Neyron = new Web_perceptron(m_max_x_62, max_y, g_input); // Создаем экземпляр нашего нейрона
+
+            openFileDialog1.Title = "Укажите файл весов";
+            openFileDialog1.ShowDialog();
+            m_w_file = openFileDialog1.FileName;
+            StreamReader sr = File.OpenText(m_w_file);  // Загружаем файл весов
+            string line;
+            string[] s1;
+            int k = 0;
+            try
+            {
+                while ((line = sr.ReadLine()) != null)
+                {
+
+                    s1 = line.Split(' ');
+                    for (int i = 0; i < s1.Length; i++)
+                    {
+                        listBox1.Items.Add("");
+                        if (k < max_y)
+                        {
+                            g_Neyron.m_weight[i, k] = Convert.ToInt32(s1[i]); // Назначаем каждой связи её записанный ранее вес
+                            listBox1.Items[k] += Convert.ToString(g_Neyron.m_weight[i, k]); // Выводим веса, для наглядности
+                        }
+
+                    }
+                    k++;
+
+                }
+            }
+            catch { }
+            sr.Close();
+        }
+        private void g_Train()
+        {
+
+            button_train.Enabled = true;
+            listBox1.Items.Clear();
+            openFileDialog1.Title = "Укажите тестируемый файл";
+            openFileDialog1.ShowDialog();
+            pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
+            Bitmap im = pictureBox1.Image as Bitmap;
+
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+
+            Dictonary_train[] x_dictonary = new Dictonary_train[m_max_x_62];
+            int max_y = 0;
+            for (int it_x = 0; it_x < m_max_x_62; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary[it_x] = new Dictonary_train(f_name);
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+
+            //for (var i = 0; i < max_y; i++) listBox1.Items.Add(" ");
+
+            for (var x = 0; x < m_max_x_62; x++)
+            {
+                for (var y = 0; y < max_y; y++)
+                {
+                    // listBox1.Items.Add(Convert.ToString(im.GetPixel(x, y).R));
+                    int n = (im.GetPixel(x, y).R);
+                    if (n >= 250) n = 0;
+                    else n = 1;
+                    //listBox1.Items[y] = listBox1.Items[y] + "  " + Convert.ToString(n);
+                    g_input[x, y] = n;
+                    //if (n == 0) input[x, y] = 1;
+                }
+
+            }
+
+            g_recognize();
+
+        }
+
+        private void button_NeyroActivate_Click(object sender, EventArgs e)
+        {
+            g_NW_Activate();
+        }
+
+        public bool g_recognize()
+        {
+            g_Neyron.mul_w();
+            g_Neyron.Sum();
+            if (g_Neyron.Rez()) listBox1.Items.Add(" - True, Sum = " + Convert.ToString(g_Neyron.m_sum));
+            else listBox1.Items.Add(" - False, Sum = " + Convert.ToString(g_Neyron.m_sum));
+            return g_Neyron.Rez();
         }
       
         private void button_open_Click(object sender, EventArgs e)
         {
-            Train();
+            g_Train();
             /*
             listBox1.Items.Clear();
             button_train.Enabled = true;
@@ -101,7 +243,7 @@ namespace perceptron_web_beeline
 
         private void button_train_Click(object sender, EventArgs e)
         {
-            PunishNeyron();
+            g_PunishNeyron();
             /*
             button_train.Enabled = false;
 
@@ -190,12 +332,15 @@ namespace perceptron_web_beeline
         private double PixelizeFloatingData(string data_string)
         {
             double double_item = ParseDoubleString(data_string);
+            if (double_item < (-1000000.0 + 0.1))
+                return double_item;
+            
             double part0 = (Math.Pow(10, (-Math.Truncate(Math.Log(Math.Abs(double_item))))) * 10);
             double part1 = Math.Truncate(double_item * part0);
             int pow_n = 2;
-            if (Math.Abs(part1) <= 10)
+            if (Math.Abs(part1) <= 1)
             {
-                while (Math.Abs(part1) <= 10 && pow_n < 6)
+                while (Math.Abs(part1) <= 1 && pow_n < 6)
                 {
                     part0 = (Math.Pow(10, (-Math.Truncate(Math.Log(Math.Abs(double_item))))) * Math.Pow(10, pow_n++));
                     part1 = Math.Truncate(double_item * part0);
@@ -204,7 +349,7 @@ namespace perceptron_web_beeline
             double_item = part1 / part0; //ЦЕЛОЕ(BG2*10^(-ЦЕЛОЕ(LOG(ABS(BG2))))*10)/(10^(-ЦЕЛОЕ(LOG(ABS(BG2))))*10)
             return double_item;
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void button_CreateDict_Click(object sender, EventArgs e)
         {
             listBox1.Items.Clear();
             button_train.Enabled = true;
@@ -217,16 +362,16 @@ namespace perceptron_web_beeline
                 {
                     string readline_buffer = "";
                     int count_lines = 0;
-                    int x_count = 62;
-                    Hashtable[] x_value_has = new Hashtable[x_count];
-                    List<int>[] x_value_list = new List<int>[x_count];
-                    for (int i = 0; i < x_count; ++i)
+                    
+                    Hashtable[] x_value_has = new Hashtable[m_max_x_62];
+                    List<int>[] x_value_list = new List<int>[m_max_x_62];
+                    for (int i = 0; i < m_max_x_62; ++i)
                     {
                         x_value_has[i] = new Hashtable();
                         x_value_list[i] = new List<int>();
                     }
                     List<int> y_value_list = new List<int>();
-                    int[] x_has = new int[x_count];
+                    int[] x_has = new int[m_max_x_62];
 
                     while ((readline_buffer = sr.ReadLine()) != null)
                     {
@@ -244,7 +389,7 @@ namespace perceptron_web_beeline
                             {
                                 if (it_item != 62)
                                 {
-                                    if (it_item == 23 || it_item == 24 || it_item == 25 || it_item == 27 || it_item == 28 || it_item == 30 || it_item == 53 || it_item == 54 || it_item == 55 || it_item == 56 || it_item == 57 || it_item == 58 || it_item == 59 || it_item == 60 || it_item == 61)
+                                    if (ItemIsForDouble(it_item))
                                     {
                                         double double_item = PixelizeFloatingData(result[it_item]);
                                                                                 
@@ -271,7 +416,7 @@ namespace perceptron_web_beeline
                                     }
                                 }
                                 
-                                if (it_item == x_count)
+                                if (it_item == m_max_x_62)
                                 {
                                     int int_value_y = ParseIntString(result[it_item]);
                                     y_value_list.Add(int_value_y);
@@ -283,10 +428,12 @@ namespace perceptron_web_beeline
                        // if (count_lines > 500) //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                          //   break;
                     }
+                    listBox1.Items.Add("Добавлено строчек: " + count_lines.ToString());
+
                     Dictonary_train y_dictonary = new Dictonary_train("y");
                     y_dictonary.SetDict(ref y_value_list);
                     y_dictonary.Flush();
-                    for (int it_x = 0; it_x < x_count; ++it_x )
+                    for (int it_x = 0; it_x < m_max_x_62; ++it_x )
                     {
                         string f_name = "x" + it_x.ToString();
                         Dictonary_train x_dictonary = new Dictonary_train(f_name);
@@ -307,12 +454,9 @@ namespace perceptron_web_beeline
                     foreach (var list_de in y_value_list)
                     {
                         listBox1.Items.Add(" ");
-                        //Console.WriteLine("Key = {0}, Value = {1}", de.Key, de.Value);
-                        //x0_dictonary.SetDict(de.Key.ToString(), de.Value.ToString());
-                        //x0_dictonary.Flush();
                         listBox1.Items[count_y++] = list_de.ToString() + "  " + y_dictonary.m_dictonary_map[list_de.ToString()].ToString();
                     }
-                    for (int it_x = 0; it_x < x_count; ++it_x)
+                    for (int it_x = 0; it_x < m_max_x_62; ++it_x)
                     {
                         string f_name = "x" + it_x.ToString();
                         Dictonary_train x_dictonary = new Dictonary_train(f_name);
@@ -332,7 +476,7 @@ namespace perceptron_web_beeline
             }
 
         }
-        private void BItmapCreater(string input_string, string output_file_prefix, int x_count, int max_y, Dictonary_train y_dictonary, List<Dictonary_train> x_dictonary)
+        private void BItmapCreater(string input_string, string output_file_prefix, int max_y, Dictonary_train y_dictonary, List<Dictonary_train> x_dictonary)
         {
             string output_filename = output_file_prefix;
             char[] charSeparators = new char[] { ',' };
@@ -342,8 +486,8 @@ namespace perceptron_web_beeline
             {
                 bool bitmap_created = false;
 
-                var im = new Bitmap(x_count, max_y);
-                for (var x = 0; x < x_count; x++)
+                var im = new Bitmap(m_max_x_62, max_y);
+                for (var x = 0; x < m_max_x_62; x++)
                 {
                     for (var y = 0; y < max_y; y++)
                     {
@@ -362,7 +506,7 @@ namespace perceptron_web_beeline
 
                     if (it_item != 62)
                     {
-                        if (it_item == 23 || it_item == 24 || it_item == 25 || it_item == 27 || it_item == 28 || it_item == 30 || it_item == 53 || it_item == 54 || it_item == 55 || it_item == 56 || it_item == 57 || it_item == 58 || it_item == 59 || it_item == 60 || it_item == 61)
+                        if (ItemIsForDouble(it_item))
                         {
                             double double_item = PixelizeFloatingData(result[it_item]);
                             String item_value = double_item.ToString();
@@ -378,7 +522,7 @@ namespace perceptron_web_beeline
                         }
                     }
 
-                    if (it_item == x_count)
+                    if (it_item == m_max_x_62)
                     {
                         int int_value_y = ParseIntString(result[it_item]);
                         output_filename += "x_" + int_value_y.ToString() + "_.bmp";
@@ -407,10 +551,10 @@ namespace perceptron_web_beeline
 
                 /*******/
                 Dictonary_train y_dictonary = new Dictonary_train("y");
-                int x_count = 62;
+                
                 List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
                 int max_y = 0;
-                for (int it_x = 0; it_x < x_count; ++it_x)
+                for (int it_x = 0; it_x < m_max_x_62; ++it_x)
                 {
                     string f_name = "x" + it_x.ToString();
                     x_dictonary.Add(new Dictonary_train(f_name));
@@ -423,152 +567,15 @@ namespace perceptron_web_beeline
                 while ((readline_buffer = sr.ReadLine()) != null)
                 {
                     if (line_counter > 1554)
-                        BItmapCreater(readline_buffer, line_counter.ToString(), x_count, max_y, y_dictonary, x_dictonary);
+                        BItmapCreater(readline_buffer, line_counter.ToString(), max_y, y_dictonary, x_dictonary);
                     readline_buffer = "";
                     ++line_counter;
                 }
             }
         }
-        private void NeyroActivate()
-        {
-            button_train.Enabled = true;
+        
 
-            Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
-            Dictonary_train[] x_dictonary = new Dictonary_train[x_count];
-            int max_y = 0;
-            for (int it_x = 0; it_x < x_count; ++it_x)
-            {
-                string f_name = "x" + it_x.ToString();
-                x_dictonary[it_x] = new Dictonary_train(f_name);
-                if (x_dictonary[it_x].Count() > max_y)
-                    max_y = x_dictonary[it_x].Count();
-            }
-            m_Neyron = new Web_perceptron(x_count, max_y, m_input); // Создаем экземпляр нашего нейрона
-
-            openFileDialog1.Title = "Укажите файл весов";
-            openFileDialog1.ShowDialog();
-            m_w_file = openFileDialog1.FileName;
-            StreamReader sr = File.OpenText(m_w_file);  // Загружаем файл весов
-            string line;
-            string[] s1;
-            int k = 0;
-            try
-            {
-                while ((line = sr.ReadLine()) != null)
-                {
-
-                    s1 = line.Split(' ');
-                    for (int i = 0; i < s1.Length; i++)
-                    {
-                        listBox1.Items.Add("");
-                        if (k < max_y)
-                        {
-                            m_Neyron.m_weight[i, k] = Convert.ToInt32(s1[i]); // Назначаем каждой связи её записанный ранее вес
-                            listBox1.Items[k] += Convert.ToString(m_Neyron.m_weight[i, k]); // Выводим веса, для наглядности
-                        }
-
-                    }
-                    k++;
-
-                }
-            }
-            catch { }
-            sr.Close();
-        }
-        private void Train()
-        {
-
-            button_train.Enabled = true;
-            listBox1.Items.Clear();            
-            openFileDialog1.Title = "Укажите тестируемый файл";
-            openFileDialog1.ShowDialog();
-            pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
-            Bitmap im = pictureBox1.Image as Bitmap;
-
-            Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
-            Dictonary_train[] x_dictonary = new Dictonary_train[x_count];
-            int max_y = 0;
-            for (int it_x = 0; it_x < x_count; ++it_x)
-            {
-                string f_name = "x" + it_x.ToString();
-                x_dictonary[it_x] = new Dictonary_train(f_name);
-                if (x_dictonary[it_x].Count() > max_y)
-                    max_y = x_dictonary[it_x].Count();
-            }
-
-            //for (var i = 0; i < max_y; i++) listBox1.Items.Add(" ");
-
-            for (var x = 0; x < x_count; x++)
-            {
-                for (var y = 0; y < max_y; y++)
-                {
-                    // listBox1.Items.Add(Convert.ToString(im.GetPixel(x, y).R));
-                    int n = (im.GetPixel(x, y).R);
-                    if (n >= 250) n = 0;
-                    else n = 1;
-                    //listBox1.Items[y] = listBox1.Items[y] + "  " + Convert.ToString(n);
-                    m_input[x, y] = n;
-                    //if (n == 0) input[x, y] = 1;
-                }
-
-            }
-
-            recognize();
-
-        }
-
-        private void button_NeyroActivate_Click(object sender, EventArgs e)
-        {
-            NeyroActivate();
-        }
-
-        private void PunishNeyron()
-        {
-            button_train.Enabled = false;
-
-            if (m_Neyron.Rez() == false)
-                m_Neyron.incW(m_input);
-            else m_Neyron.decW(m_input);
-
-            //Запись
-            string s = "";
-            
-            System.IO.File.Delete(m_w_file);
-            FileStream FS = new FileStream(m_w_file, FileMode.OpenOrCreate);
-            StreamWriter SW = new StreamWriter(FS);
-
-            Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
-            Dictonary_train[] x_dictonary = new Dictonary_train[x_count];
-            int max_y = 0;
-            for (int it_x = 0; it_x < x_count; ++it_x)
-            {
-                string f_name = "x" + it_x.ToString();
-                x_dictonary[it_x] = new Dictonary_train(f_name);
-                if (x_dictonary[it_x].Count() > max_y)
-                    max_y = x_dictonary[it_x].Count();
-            }
-
-            string[] s1 = new string[max_y];
-            for (int y = 0; y < max_y; y++)
-            {
-
-                for (var x = 0; x < x_count; x++)
-                {
-                    s += Convert.ToString(m_Neyron.m_weight[x, y]);
-                    if (x != x_count) s += " ";
-                }
-
-                s1[y] = s;
-
-                SW.WriteLine(s);
-                s = "";
-
-            }
-            SW.Close();
-        }
+        
         /*
         private void LoadCreateNeyro( ref Web_perceptron neyron)
         {
@@ -612,7 +619,7 @@ namespace perceptron_web_beeline
             Bitmap im = pictureBox1.Image as Bitmap;
 
             Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
+            
             Dictonary_train[] x_dictonary = new Dictonary_train[x_count];
             int max_y = 0;
             for (int it_x = 0; it_x < x_count; ++it_x)
@@ -641,18 +648,18 @@ namespace perceptron_web_beeline
         private void AutoTrain( int it_w, string name_bmp)
         {
             Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
-            Dictonary_train[] x_dictonary = new Dictonary_train[x_count];
+           
+            Dictonary_train[] x_dictonary = new Dictonary_train[m_max_x_62];
             int max_y = 0;
-            for (int it_x = 0; it_x < x_count; ++it_x)
+            for (int it_x = 0; it_x < m_max_x_62; ++it_x)
             {
                 string f_name = "x" + it_x.ToString();
                 x_dictonary[it_x] = new Dictonary_train(f_name);
                 if (x_dictonary[it_x].Count() > max_y)
                     max_y = x_dictonary[it_x].Count();
             }
-            int[,] input = new int[x_count, max_y];
-            Web_perceptron neyron = new Web_perceptron(x_count, max_y, input);
+            int[,] input = new int[m_max_x_62, max_y];
+            Web_perceptron neyron = new Web_perceptron(m_max_x_62, max_y, input);
 
             //*********************
             string line_read_weight_buffer;
@@ -665,7 +672,7 @@ namespace perceptron_web_beeline
                 {
 
                     str_weight_read_buffer = line_read_weight_buffer.Split(' ');
-                    for (int it_weight_x = 0; it_weight_x < x_count; it_weight_x++)
+                    for (int it_weight_x = 0; it_weight_x < m_max_x_62; it_weight_x++)
                     {
                         //listBox1.Items.Add("");
                         if (it_weight_y < max_y)
@@ -709,7 +716,7 @@ namespace perceptron_web_beeline
             //***********
             Bitmap im = pictureBox1.Image as Bitmap;
 
-            for (var x = 0; x < x_count; x++)
+            for (var x = 0; x < m_max_x_62; x++)
             {
                 for (var y = 0; y < max_y; y++)
                 {
@@ -740,10 +747,10 @@ namespace perceptron_web_beeline
                 for (int y = 0; y < max_y; y++)
                 {
 
-                    for (var x = 0; x < x_count; x++)
+                    for (var x = 0; x < m_max_x_62; x++)
                     {
                         str_write_weight_buffer += Convert.ToString(neyron.m_weight[x, y]);
-                        if (x != x_count) str_write_weight_buffer += " ";
+                        if (x != m_max_x_62) str_write_weight_buffer += " ";
                     }
 
                     s1[y] = str_write_weight_buffer;
@@ -793,6 +800,14 @@ namespace perceptron_web_beeline
 
             MessageBox.Show("Auto train success!");
         }
+
+        private bool ItemIsForDouble(int it_item)
+        {
+            if (it_item == 8 || it_item == 23 || it_item == 24 || it_item == 25 || it_item == 27 || it_item == 28 || it_item == 30 || it_item == 53 || it_item == 54 || it_item == 55 || it_item == 56 || it_item == 57 || it_item == 58 || it_item == 59 || it_item == 60 || it_item == 61)
+                return true;
+            else return false;
+        }
+
     }
 }
 

@@ -49,9 +49,11 @@
             // 
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 109);
+            this.listBox1.ItemHeight = 16;
+            this.listBox1.Location = new System.Drawing.Point(16, 134);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(4);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(1092, 407);
+            this.listBox1.Size = new System.Drawing.Size(487, 292);
             this.listBox1.TabIndex = 0;
             // 
             // pictureBox1
@@ -59,17 +61,19 @@
             this.pictureBox1.ErrorImage = null;
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
-            this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+            this.pictureBox1.Location = new System.Drawing.Point(16, 15);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(78, 69);
+            this.pictureBox1.Size = new System.Drawing.Size(104, 85);
             this.pictureBox1.TabIndex = 2;
             this.pictureBox1.TabStop = false;
             // 
             // button_open
             // 
-            this.button_open.Location = new System.Drawing.Point(107, 12);
+            this.button_open.Location = new System.Drawing.Point(271, 15);
+            this.button_open.Margin = new System.Windows.Forms.Padding(4);
             this.button_open.Name = "button_open";
-            this.button_open.Size = new System.Drawing.Size(75, 23);
+            this.button_open.Size = new System.Drawing.Size(100, 28);
             this.button_open.TabIndex = 3;
             this.button_open.Text = "Open";
             this.button_open.UseVisualStyleBackColor = true;
@@ -77,9 +81,10 @@
             // 
             // button_train
             // 
-            this.button_train.Location = new System.Drawing.Point(203, 12);
+            this.button_train.Location = new System.Drawing.Point(403, 13);
+            this.button_train.Margin = new System.Windows.Forms.Padding(4);
             this.button_train.Name = "button_train";
-            this.button_train.Size = new System.Drawing.Size(75, 23);
+            this.button_train.Size = new System.Drawing.Size(100, 28);
             this.button_train.TabIndex = 4;
             this.button_train.Text = "Не верно";
             this.button_train.UseVisualStyleBackColor = true;
@@ -87,19 +92,21 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(107, 80);
+            this.button1.Location = new System.Drawing.Point(143, 51);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(100, 28);
             this.button1.TabIndex = 5;
             this.button1.Text = "CreateDict";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.button_CreateDict_Click);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(203, 80);
+            this.button2.Location = new System.Drawing.Point(271, 51);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(100, 28);
             this.button2.TabIndex = 6;
             this.button2.Text = "CreateBitmap";
             this.button2.UseVisualStyleBackColor = true;
@@ -107,9 +114,10 @@
             // 
             // button_NeyroActivate
             // 
-            this.button_NeyroActivate.Location = new System.Drawing.Point(302, 80);
+            this.button_NeyroActivate.Location = new System.Drawing.Point(143, 15);
+            this.button_NeyroActivate.Margin = new System.Windows.Forms.Padding(4);
             this.button_NeyroActivate.Name = "button_NeyroActivate";
-            this.button_NeyroActivate.Size = new System.Drawing.Size(75, 23);
+            this.button_NeyroActivate.Size = new System.Drawing.Size(100, 28);
             this.button_NeyroActivate.TabIndex = 7;
             this.button_NeyroActivate.Text = "button_NeyroActivate";
             this.button_NeyroActivate.UseVisualStyleBackColor = true;
@@ -117,9 +125,10 @@
             // 
             // button_AutoTrain
             // 
-            this.button_AutoTrain.Location = new System.Drawing.Point(302, 13);
+            this.button_AutoTrain.Location = new System.Drawing.Point(403, 49);
+            this.button_AutoTrain.Margin = new System.Windows.Forms.Padding(4);
             this.button_AutoTrain.Name = "button_AutoTrain";
-            this.button_AutoTrain.Size = new System.Drawing.Size(75, 23);
+            this.button_AutoTrain.Size = new System.Drawing.Size(100, 28);
             this.button_AutoTrain.TabIndex = 8;
             this.button_AutoTrain.Text = "AutoTrain";
             this.button_AutoTrain.UseVisualStyleBackColor = true;
@@ -127,9 +136,9 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1124, 538);
+            this.ClientSize = new System.Drawing.Size(539, 461);
             this.Controls.Add(this.button_AutoTrain);
             this.Controls.Add(this.button_NeyroActivate);
             this.Controls.Add(this.button2);
@@ -138,6 +147,7 @@
             this.Controls.Add(this.button_open);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.listBox1);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
