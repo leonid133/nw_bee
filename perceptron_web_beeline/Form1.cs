@@ -725,7 +725,9 @@ namespace perceptron_web_beeline
             {
                 for (var y = 0; y < max_y; y++)
                 {
-                    int n = (image_x.GetPixel(x, y).R);
+                    int n = 255;
+                    if (image_x.Width >= x && image_x.Height >= y) 
+                        n = (image_x.GetPixel(x, y).R);
                     if (n >= 250) n = 0;
                     else n = 1;
                     input[x, y] = n;
@@ -805,6 +807,7 @@ namespace perceptron_web_beeline
                                 m_w_file = "w" + it_w.ToString();
                                 pictureBox1.Image = Image.FromFile(file);
                                 AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y, y_dictonary, x_dictonary);
+                                pictureBox1.Dispose();
                             }
                         }
                     }
