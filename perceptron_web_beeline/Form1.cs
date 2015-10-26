@@ -293,7 +293,7 @@ namespace perceptron_web_beeline
             int result = -1000000;
             try
             {
-                result = Convert.ToInt32(int_str, 16);
+                result = Convert.ToInt32(int_str, 10);
                 //Console.WriteLine("Converted int'{0}' to int32 {1}.", int_str, result);
             }
             catch (FormatException)
