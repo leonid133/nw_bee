@@ -19,7 +19,7 @@ namespace perceptron_web_beeline
     public partial class Form1 : Form
     {
         Web_perceptron g_Neyron;
-        public int[,] g_input = new int[63, 349];
+        public int[,] g_input = new int[64, 495];
 
         public string m_w_file;
         public int m_max_x_62 = 62;
@@ -130,15 +130,14 @@ namespace perceptron_web_beeline
             string line;
             string[] s1;
             int k = 0;
-            try
-            {
                 while ((line = sr.ReadLine()) != null)
                 {
-
+                    listBox1.Items.Add("");
+                    k = 0;
                     s1 = line.Split(' ');
                     for (int i = 0; i < s1.Length; i++)
                     {
-                        listBox1.Items.Add("");
+                        
                         if (k < max_y)
                         {
                             g_Neyron.m_weight[i, k] = Convert.ToInt32(s1[i]); // Назначаем каждой связи её записанный ранее вес
@@ -149,8 +148,7 @@ namespace perceptron_web_beeline
                     k++;
 
                 }
-            }
-            catch { }
+            
             sr.Close();
         }
         private void g_Train()
@@ -320,11 +318,25 @@ namespace perceptron_web_beeline
             }
             catch (FormatException)
             {
+               
                 Console.WriteLine("Unable to convert '{0}' to a Double.", double_str);
             }
             catch (OverflowException)
             {
                 Console.WriteLine("'{0}' is outside the range of a Double.", double_str);
+            }
+          
+            if (result < (-1000000.0 + 0.1))
+            {
+                try
+                {
+                    NumberStyles ns = NumberStyles.Any;
+                    result = Double.Parse(double_str, ns, CultureInfo.InvariantCulture);
+                }
+                catch (FormatException)
+                {
+                    result = ParseHexString(double_str);
+                }
             }
             return result;
         }
@@ -660,7 +672,7 @@ namespace perceptron_web_beeline
             //recognize();
 
         }*/
-        private void AutoTrain(int it_w, string name_bmp, int max_y, Dictonary_train y_dictonary, List<Dictonary_train> x_dictonary)
+        private void AutoTrain(int it_w, string name_bmp, int max_y)
         {
             
             int[,] input = new int[m_max_x_62, max_y];
@@ -725,7 +737,9 @@ namespace perceptron_web_beeline
             {
                 for (var y = 0; y < max_y; y++)
                 {
-                    int n = (image_x.GetPixel(x, y).R);
+                    int n = 255;
+                    if(image_x.Width >= x && image_x.Height >= y)
+                        n = (image_x.GetPixel(x, y).R);
                     if (n >= 250) n = 0;
                     else n = 1;
                     input[x, y] = n;
@@ -804,7 +818,8 @@ namespace perceptron_web_beeline
                                 //listBox1.Items.Add(file);
                                 m_w_file = "w" + it_w.ToString();
                                 pictureBox1.Image = Image.FromFile(file);
-                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y, y_dictonary, x_dictonary);
+                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y);
+                                pictureBox1.Dispose();
                             }
                         }
                     }
@@ -834,6 +849,114 @@ namespace perceptron_web_beeline
                 return true;
             else
                 return false;
+        }
+        private void TestBItmapCreater(string input_string, string output_file_prefix, int max_y, Dictonary_train y_dictonary, List<Dictonary_train> x_dictonary)
+        {
+            string output_filename = output_file_prefix;
+            char[] charSeparators = new char[] { ',' };
+            string[] result = input_string.Split(charSeparators, StringSplitOptions.None);
+
+            try
+            {
+                bool bitmap_created = false;
+
+                var im = new Bitmap(m_max_x_62, max_y);
+                for (var x = 0; x < m_max_x_62; x++)
+                {
+                    for (var y = 0; y < max_y; y++)
+                    {
+                        /*
+                        int n = (im.GetPixel(x, y).R);
+                        if (n >= 250) n = 0;
+                        else n = 1;*/
+                        im.SetPixel(x, y, Color.White);
+                    }
+                }
+                bitmap_created = true;
+
+
+                for (int it_item = 0; it_item < result.Count(); ++it_item)
+                {
+                    if (it_item == 0)
+                    {
+                        int int_value_y = ParseIntString(result[it_item]);
+                        output_filename += "_testx_" + int_value_y.ToString() + "_.bmp";
+                    }
+                    else
+                    {
+                        int it_item_0 = it_item - 1;
+                        try
+                        {
+                            if (ItemIsDouble(it_item_0))
+                            {
+                                String item_value = PixelizeFloatingData(result[it_item]);
+                                int y_dot = x_dictonary[it_item_0].m_dictonary_map[item_value];
+                                if (bitmap_created) im.SetPixel(it_item_0, y_dot, Color.Black);
+                            }
+                            else if (ItemIsHex(it_item_0))
+                            {
+                                String item_value = PixelizeFloatingData(ParseHexString(result[it_item]).ToString());
+                                int y_dot = x_dictonary[it_item_0].m_dictonary_map[item_value];
+                                if (bitmap_created) im.SetPixel(it_item_0, y_dot, Color.Black);
+                            }
+                            else
+                            {
+                                //long long_value_x0 = ParseHexString(result[it_item]);
+                                String item_value = result[it_item];
+                                int y_dot = x_dictonary[it_item_0].m_dictonary_map[item_value];
+                                if (bitmap_created) im.SetPixel(it_item_0, y_dot, Color.Black);   
+                            }
+                        }
+                        catch {
+                            
+                        }
+                    }
+                   
+                }
+                if (bitmap_created) im.Save(output_filename);
+                im.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+
+            }
+        }
+        private void button_CreateTestBMP_Click(object sender, EventArgs e)
+        {
+
+            openFileDialog1.Title = "Укажите файл обучающих данных";
+            openFileDialog1.ShowDialog();
+
+            using (StreamReader sr = File.OpenText(openFileDialog1.FileName))
+            {
+
+                /*******/
+                Dictonary_train y_dictonary = new Dictonary_train("y");
+
+                List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+                int max_y = 0;
+                for (int it_x = 0; it_x < m_max_x_62; ++it_x)
+                {
+                    string f_name = "x" + it_x.ToString();
+                    x_dictonary.Add(new Dictonary_train(f_name));
+                    if (x_dictonary[it_x].Count() > max_y)
+                        max_y = x_dictonary[it_x].Count();
+                }
+                /*****/
+                int line_counter = 0;
+                string readline_buffer = "";
+                while ((readline_buffer = sr.ReadLine()) != null)
+                {
+                    // if (line_counter > 1554)
+                    TestBItmapCreater(readline_buffer, line_counter.ToString(), max_y, y_dictonary, x_dictonary);
+                    readline_buffer = "";
+                    ++line_counter;
+                }
+            }
         }
 
     }
