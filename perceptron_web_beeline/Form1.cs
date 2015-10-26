@@ -808,21 +808,21 @@ namespace perceptron_web_beeline
                 }
                 try
                 {
-                    for (int it_w = 0; it_w < 8; ++it_w)
+                    int it_file = 0;
+                    foreach (string file in openFileDialog1.FileNames)
                     {
-                        if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
+                        pictureBox1.Image = Image.FromFile(file);
+                        //listBox1.Items.Add(file);
+                            
+                        for (int it_w = 0; it_w < 8; ++it_w)
                         {
-                            int it_file = 0;
-                            foreach (string file in openFileDialog1.FileNames)
+                            if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                             {
-                                //listBox1.Items.Add(file);
                                 m_w_file = "w" + it_w.ToString();
-                                pictureBox1.Image = Image.FromFile(file);
                                 AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y);
-                                pictureBox1.Dispose();
-                                pictureBox1.Dispose();
                             }
                         }
+                        pictureBox1.Dispose();
                     }
                 }
                 catch (Exception ex)
