@@ -329,25 +329,27 @@ namespace perceptron_web_beeline
             return result;
         }
 
-        private double PixelizeFloatingData(string data_string)
+        private string PixelizeFloatingData(string data_string)
         {
+            string resultpixel = "NullPixell";
             double double_item = ParseDoubleString(data_string);
             if (double_item < (-1000000.0 + 0.1))
-                return double_item;
+                return resultpixel;
             
             double part0 = (Math.Pow(10, (-Math.Truncate(Math.Log(Math.Abs(double_item))))) * 10);
             double part1 = Math.Truncate(double_item * part0);
             int pow_n = 2;
             if (Math.Abs(part1) <= 1)
             {
-                while (Math.Abs(part1) <= 1 && pow_n < 6)
+                while (Math.Abs(part1) <= 1 && pow_n < 25)
                 {
                     part0 = (Math.Pow(10, (-Math.Truncate(Math.Log(Math.Abs(double_item))))) * Math.Pow(10, pow_n++));
                     part1 = Math.Truncate(double_item * part0);
                 }
             }
             double_item = part1 / part0; //ЦЕЛОЕ(BG2*10^(-ЦЕЛОЕ(LOG(ABS(BG2))))*10)/(10^(-ЦЕЛОЕ(LOG(ABS(BG2))))*10)
-            return double_item;
+            resultpixel = double_item.ToString("E1");
+            return resultpixel ;
         }
         private void button_CreateDict_Click(object sender, EventArgs e)
         {
@@ -389,11 +391,20 @@ namespace perceptron_web_beeline
                             {
                                 if (it_item != 62)
                                 {
-                                    if (ItemIsForDouble(it_item))
+                                    if (ItemIsDouble(it_item))
                                     {
-                                        double double_item = PixelizeFloatingData(result[it_item]);
-                                                                                
-                                        String item_value = double_item.ToString();
+                                        String item_value =  PixelizeFloatingData(result[it_item]);
+                                        if (!x_value_has[it_item].Contains(item_value))
+                                        {
+                                            ++x_has[it_item];
+                                            x_value_has[it_item].Add(item_value, x_has[it_item]);
+                                        }
+                                        int int_val = ParseIntString(x_value_has[it_item][item_value].ToString());
+                                        x_value_list[it_item].Add(int_val);
+                                    }
+                                    else if (ItemIsHex(it_item))
+                                    {
+                                        String item_value = PixelizeFloatingData(ParseHexString(result[it_item]).ToString());
                                         if (!x_value_has[it_item].Contains(item_value))
                                         {
                                             ++x_has[it_item];
@@ -503,13 +514,17 @@ namespace perceptron_web_beeline
 
                 for (int it_item = 0; it_item < result.Count(); ++it_item)
                 {
-
                     if (it_item != 62)
                     {
-                        if (ItemIsForDouble(it_item))
+                        if (ItemIsDouble(it_item))
                         {
-                            double double_item = PixelizeFloatingData(result[it_item]);
-                            String item_value = double_item.ToString();
+                            String item_value = PixelizeFloatingData(result[it_item]);
+                            int y_dot = x_dictonary[it_item].m_dictonary_map[item_value];
+                            if (bitmap_created) im.SetPixel(it_item, y_dot, Color.Black);
+                        }
+                        else if (ItemIsHex(it_item))
+                        {
+                            String item_value = PixelizeFloatingData(ParseHexString(result[it_item]).ToString());
                             int y_dot = x_dictonary[it_item].m_dictonary_map[item_value];
                             if (bitmap_created) im.SetPixel(it_item, y_dot, Color.Black);
                         }
@@ -566,7 +581,7 @@ namespace perceptron_web_beeline
                 string readline_buffer = "";
                 while ((readline_buffer = sr.ReadLine()) != null)
                 {
-                    if (line_counter > 1554)
+                   // if (line_counter > 1554)
                         BItmapCreater(readline_buffer, line_counter.ToString(), max_y, y_dictonary, x_dictonary);
                     readline_buffer = "";
                     ++line_counter;
@@ -801,11 +816,18 @@ namespace perceptron_web_beeline
             MessageBox.Show("Auto train success!");
         }
 
-        private bool ItemIsForDouble(int it_item)
+        private bool ItemIsDouble(int it_item)
         {
-            if (it_item == 8 || it_item == 23 || it_item == 24 || it_item == 25 || it_item == 27 || it_item == 28 || it_item == 30 || it_item == 53 || it_item == 54 || it_item == 55 || it_item == 56 || it_item == 57 || it_item == 58 || it_item == 59 || it_item == 60 || it_item == 61)
+            if (it_item == 8 || it_item == 13 || it_item == 23 || it_item == 24 || it_item == 25 || it_item == 26 || it_item == 27 || it_item == 28 || it_item == 29 || it_item == 30 || it_item == 31 || it_item == 32 || it_item == 33 || it_item == 34 || it_item == 35 || it_item == 36 || it_item == 37 || it_item == 38 || it_item == 39 || it_item == 40 || it_item == 41 || it_item == 42 || it_item == 43 || it_item == 44 || it_item == 45 || it_item == 46 || it_item == 47 || it_item == 48 || it_item == 49 || it_item == 50 || it_item == 51 || it_item == 52 || it_item == 53 || it_item == 54 || it_item == 55 || it_item == 56 || it_item == 57 || it_item == 58 || it_item == 59 || it_item == 60 || it_item == 61)
                 return true;
             else return false;
+        }
+        private bool ItemIsHex(int it_item)
+        {
+            if (!ItemIsDouble(it_item) &&( it_item == 0 || it_item == 1 || it_item == 2 || it_item == 10 || it_item == 11 || it_item == 12 || it_item == 14 || it_item == 15 || it_item == 16 || it_item == 17 || it_item == 18 || it_item == 19 || it_item == 20 || it_item == 21 || it_item == 22 ))
+                return true;
+            else
+                return false;
         }
 
     }
