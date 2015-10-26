@@ -660,19 +660,9 @@ namespace perceptron_web_beeline
             //recognize();
 
         }*/
-        private void AutoTrain( int it_w, string name_bmp)
+        private void AutoTrain(int it_w, string name_bmp, int max_y, Dictonary_train y_dictonary, List<Dictonary_train> x_dictonary)
         {
-            Dictonary_train y_dictonary = new Dictonary_train("y");
-           
-            Dictonary_train[] x_dictonary = new Dictonary_train[m_max_x_62];
-            int max_y = 0;
-            for (int it_x = 0; it_x < m_max_x_62; ++it_x)
-            {
-                string f_name = "x" + it_x.ToString();
-                x_dictonary[it_x] = new Dictonary_train(f_name);
-                if (x_dictonary[it_x].Count() > max_y)
-                    max_y = x_dictonary[it_x].Count();
-            }
+            
             int[,] input = new int[m_max_x_62, max_y];
             Web_perceptron neyron = new Web_perceptron(m_max_x_62, max_y, input);
 
@@ -789,6 +779,17 @@ namespace perceptron_web_beeline
             openFileDialog1.Multiselect = true;
             if(openFileDialog1.ShowDialog() == DialogResult.OK)
             {
+                Dictonary_train y_dictonary = new Dictonary_train("y");
+                int x_count = 62;
+                List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+                int max_y = 0;
+                for (int it_x = 0; it_x < x_count; ++it_x)
+                {
+                    string f_name = "x" + it_x.ToString();
+                    x_dictonary.Add(new Dictonary_train(f_name));
+                    if (x_dictonary[it_x].Count() > max_y)
+                        max_y = x_dictonary[it_x].Count();
+                }
                 try
                 {
                     for (int it_w = 0; it_w < 8; ++it_w)
@@ -796,10 +797,10 @@ namespace perceptron_web_beeline
                         int it_file = 0;
                         foreach (string file in openFileDialog1.FileNames)
                         {
-                            listBox1.Items.Add(file);
+                            //listBox1.Items.Add(file);
                             m_w_file = "w" + it_w.ToString();
                             pictureBox1.Image = Image.FromFile(file);
-                            AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString());
+                            AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y, y_dictonary, x_dictonary);
                         }
                     }
                 }
