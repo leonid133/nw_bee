@@ -675,9 +675,20 @@ namespace perceptron_web_beeline
             //recognize();
 
         }*/
-        private void AutoTrain(int it_w, string name_bmp, int max_y, ref Bitmap image_x)
+        private void AutoTrain(int it_w, ref string readline_buffer)
         {
-            
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+            int x_count = 62;
+            List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+            int max_y = 0;
+            for (int it_x = 0; it_x < x_count; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary.Add(new Dictonary_train(f_name));
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+            //********************
             int[,] input = new int[m_max_x_62, max_y];
             Web_perceptron neyron = new Web_perceptron(m_max_x_62, max_y, input);
 
@@ -715,9 +726,74 @@ namespace perceptron_web_beeline
                 sr_weight.Close();
             }
             //*********************
+            string output_filename = "";;
+            char[] charSeparators = new char[] { ',' };
+            string[] result = readline_buffer.Split(charSeparators, StringSplitOptions.None);
+            var im = new Bitmap(m_max_x_62, max_y);
+            try
+            {
+                bool bitmap_created = false;
+
+               
+                for (var x = 0; x < m_max_x_62; x++)
+                {
+                    for (var y = 0; y < max_y; y++)
+                    {
+                        /*
+                        int n = (im.GetPixel(x, y).R);
+                        if (n >= 250) n = 0;
+                        else n = 1;*/
+                        im.SetPixel(x, y, Color.White);
+                    }
+                }
+                bitmap_created = true;
+
+
+                for (int it_item = 0; it_item < result.Count(); ++it_item)
+                {
+                    if (it_item != 62)
+                    {
+                        if (ItemIsDouble(it_item))
+                        {
+                            String item_value = PixelizeFloatingData(result[it_item]);
+                            int y_dot = x_dictonary[it_item].m_dictonary_map[item_value];
+                            if (bitmap_created) im.SetPixel(it_item, y_dot, Color.Black);
+                        }
+                        else if (ItemIsHex(it_item))
+                        {
+                            String item_value = PixelizeFloatingData(ParseHexString(result[it_item]).ToString());
+                            int y_dot = x_dictonary[it_item].m_dictonary_map[item_value];
+                            if (bitmap_created) im.SetPixel(it_item, y_dot, Color.Black);
+                        }
+                        else
+                        {
+                            //long long_value_x0 = ParseHexString(result[it_item]);
+                            String item_value = result[it_item];
+                            int y_dot = x_dictonary[it_item].m_dictonary_map[item_value];
+                            if (bitmap_created) im.SetPixel(it_item, y_dot, Color.Black);
+                        }
+                    }
+
+                    if (it_item == m_max_x_62)
+                    {
+                        int int_value_y = ParseIntString(result[it_item]);
+                        output_filename += "x_" + int_value_y.ToString() + "_.bmp";
+                    }
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            finally
+            {
+
+            }
+            //*********************
             
             char[] bmp_filename_charSeparators = new char[] { '_' };
-            string[] result_split_bmp = name_bmp.Split(bmp_filename_charSeparators, StringSplitOptions.None);
+            string[] result_split_bmp = output_filename.Split(bmp_filename_charSeparators, StringSplitOptions.None);
             int bmp_file_suffix = 9;
             for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
             {
@@ -729,7 +805,9 @@ namespace perceptron_web_beeline
                 }
                 catch { }
             }
+
             bool train_to_this = false;
+
             if (it_w == bmp_file_suffix)
                 train_to_this = true;
 
@@ -743,8 +821,8 @@ namespace perceptron_web_beeline
                 for (var y = 0; y < max_y; y++)
                 {
                     int n = 255;
-                    if(image_x.Width >= x && image_x.Height >= y)
-                        n = (image_x.GetPixel(x, y).R);
+                    if(im.Width >= x && im.Height >= y)
+                        n = (im.GetPixel(x, y).R);
                     if (n >= 250) n = 0;
                     else n = 1;
                     input[x, y] = n;
@@ -788,7 +866,8 @@ namespace perceptron_web_beeline
 
                 sw_weight_writer.Close();
                 fs_weight_writer.Close();
-            }      
+            }
+            im.Dispose();
             //***********
         }
        
@@ -797,7 +876,7 @@ namespace perceptron_web_beeline
             openFileDialog1.Filter = "bmp files (*.bmp)|*.bmp|All files (*.*)|*.*" ;
             openFileDialog1.FilterIndex = 2 ;
             openFileDialog1.RestoreDirectory = true ;
-            openFileDialog1.Multiselect = true;
+            openFileDialog1.Multiselect = false;
             if(openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 if (backgroundWorker_Autotrain.IsBusy != true)
@@ -1019,40 +1098,33 @@ namespace perceptron_web_beeline
         private void backgroundWorker_Autotrain_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
-            Dictonary_train y_dictonary = new Dictonary_train("y");
-            int x_count = 62;
-            List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
-            int max_y = 0;
-            for (int it_x = 0; it_x < x_count; ++it_x)
-            {
-                string f_name = "x" + it_x.ToString();
-                x_dictonary.Add(new Dictonary_train(f_name));
-                if (x_dictonary[it_x].Count() > max_y)
-                    max_y = x_dictonary[it_x].Count();
-            }
+            
+            
             try
             {
-                int it_file = 0;
-                foreach (string file in openFileDialog1.FileNames)
+                using (StreamReader sr = File.OpenText(openFileDialog1.FileName))
                 {
-                    //listBox1.Items.Add(file);
-                   // pictureBox1.Image = Image.FromFile(file);
-                    //pictureBox1.Load(file);
-                    Bitmap image_x = new Bitmap(file);
-                    for (int it_w = 0; it_w < m_W_count; ++it_w)
+                    int line_counter = 0;
+                    string readline_buffer = "";
+                    while ((readline_buffer = sr.ReadLine()) != null)
                     {
-
-
-                        if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
+                        // if (line_counter > 1554)
+                       //BItmapCreater(readline_buffer, line_counter.ToString(), max_y, y_dictonary, x_dictonary);
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
-                            m_w_file = "w" + it_w.ToString();
-                            AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y, ref image_x);
-                        }
 
+
+                            if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
+                            {
+                                m_w_file = "w" + it_w.ToString();
+                                if (line_counter>0)
+                                    AutoTrain(it_w, ref readline_buffer);
+                            }
+
+                        }
+                        readline_buffer = "";
+                        ++line_counter;
                     }
-                    image_x.Dispose();
-                    //pictureBox1.Dispose();
-                    it_file++;
                 }
             }
             catch (Exception ex)
