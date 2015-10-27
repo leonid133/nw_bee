@@ -1098,8 +1098,8 @@ namespace perceptron_web_beeline
                         }
                         image_x.Dispose();
                         pictureBox1.Dispose();
-                        int maxsum = 0;
-                        int answer = -1000000;
+                        int maxsum = all_sum[0];
+                        int answer = 0;
                         for (int it_w = 0; it_w < 8; ++it_w)
                         {
                             if (all_sum[it_w] > maxsum)
@@ -1112,7 +1112,7 @@ namespace perceptron_web_beeline
                         string s = bmp_file_suffix + "," + rez_nw_list[bmp_file_suffix];
                         
                         sol_SW.WriteLine(s);
-                        sol_SW.Flush();
+                        //sol_SW.Flush();
                     }
                     sol_SW.Close();
                     /*
