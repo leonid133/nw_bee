@@ -44,6 +44,7 @@
             this.button_answer = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.backgroundWorker_Autotrain = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker_Answer = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -192,6 +193,11 @@
             this.backgroundWorker_Autotrain.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_Autotrain_DoWork);
             this.backgroundWorker_Autotrain.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_Autotrain_RunWorkerCompleted);
             // 
+            // backgroundWorker_Answer
+            // 
+            this.backgroundWorker_Answer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_Answer_DoWork);
+            this.backgroundWorker_Answer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_Answer_RunWorkerCompleted);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -233,6 +239,7 @@
         private System.Windows.Forms.Button button_answer;
         private System.Windows.Forms.ImageList imageList1;
         private System.ComponentModel.BackgroundWorker backgroundWorker_Autotrain;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_Answer;
     }
 }
 
