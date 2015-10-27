@@ -959,7 +959,7 @@ namespace perceptron_web_beeline
                 }
             }
         }
-        private void AutoAnswer(int it_w, out bool rez, out int sum, int max_y)
+        private void AutoAnswer(int it_w, out bool rez, out int sum, int max_y, ref Bitmap image_x)
         {
 
             int[,] input = new int[m_max_x_62, max_y];
@@ -1000,7 +1000,7 @@ namespace perceptron_web_beeline
             //*********************
 
            
-            Bitmap image_x = pictureBox1.Image as Bitmap;
+            
 
             for (var x = 0; x < m_max_x_62; x++)
             {
@@ -1015,7 +1015,7 @@ namespace perceptron_web_beeline
                 }
 
             }
-            image_x.Dispose();
+            
 
             neyron.mul_w();
             neyron.Sum();
@@ -1047,10 +1047,15 @@ namespace perceptron_web_beeline
                     List<int> rez_nw_list = new List<int>();
                     for (int i = 0; i < m_max_id; ++i)
                     {
-                        rez_nw_list.Add(0);                          
+                        rez_nw_list.Add(0);
                     }
-                    
-                       
+
+                    string name_answer_file = "sol";
+
+                    System.IO.File.Delete(name_answer_file);
+                    FileStream sol_FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
+                    StreamWriter sol_SW = new StreamWriter(sol_FS);
+
                     int it_file = 0;
                     foreach (string file in openFileDialog1.FileNames)
                     {
@@ -1075,24 +1080,26 @@ namespace perceptron_web_beeline
 
                         //***********
                         //listBox1.Items.Add(file);
-                                
+
                         pictureBox1.Image = Image.FromFile(file);
-                        int[] all_sum = new int[8]; 
+                        Bitmap image_x = pictureBox1.Image as Bitmap;
+                        int[] all_sum = new int[8];
 
                         for (int it_w = 0; it_w < 6; ++it_w)
                         {
                             all_sum[it_w] = 0;
                             m_w_file = "w" + it_w.ToString();
-                                    
+
                             bool rez = false;
                             int sum = 0;
-                            AutoAnswer( max_y, out rez, out sum, max_y);
-                            if (rez)
+                            AutoAnswer(max_y, out rez, out sum, max_y, ref image_x);
+                            //if (rez)
                                 all_sum[it_w] = sum;
                         }
+                        image_x.Dispose();
                         pictureBox1.Dispose();
                         int maxsum = 0;
-                        int answer = 8;
+                        int answer = -1000000;
                         for (int it_w = 0; it_w < 8; ++it_w)
                         {
                             if (all_sum[it_w] > maxsum)
@@ -1102,7 +1109,13 @@ namespace perceptron_web_beeline
                             }
                         }
                         rez_nw_list[bmp_file_suffix] = answer;
+                        string s = bmp_file_suffix + "," + rez_nw_list[bmp_file_suffix];
+                        
+                        sol_SW.WriteLine(s);
+                        sol_SW.Flush();
                     }
+                    sol_SW.Close();
+                    /*
                     string name_answer_file = "sol";
                     openFileDialog1.Multiselect = false;
                     System.IO.File.Delete(name_answer_file);
@@ -1114,15 +1127,20 @@ namespace perceptron_web_beeline
                         string s = it_id + "," + rez_nw_list[it_id]; 
                         SW.WriteLine(s);
                     }
-                    SW.Close();
+                     * */
+                    
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
                 }
+                finally
+                {
+                    openFileDialog1.Multiselect = false;
+                }
             }
 
-            MessageBox.Show("Auto train success!");
+            MessageBox.Show("Auto answer success!");
         }
 
     }
