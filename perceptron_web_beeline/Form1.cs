@@ -800,52 +800,13 @@ namespace perceptron_web_beeline
             openFileDialog1.Multiselect = true;
             if(openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                Dictonary_train y_dictonary = new Dictonary_train("y");
-                int x_count = 62;
-                List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
-                int max_y = 0;
-                for (int it_x = 0; it_x < x_count; ++it_x)
+                if (backgroundWorker_Autotrain.IsBusy != true)
                 {
-                    string f_name = "x" + it_x.ToString();
-                    x_dictonary.Add(new Dictonary_train(f_name));
-                    if (x_dictonary[it_x].Count() > max_y)
-                        max_y = x_dictonary[it_x].Count();
-                }
-                try
-                {
-                    int it_file = 0;
-                    foreach (string file in openFileDialog1.FileNames)
-                    {
-                        //listBox1.Items.Add(file);
-                        pictureBox1.Image = Image.FromFile(file);
-                        Bitmap image_x = pictureBox1.Image as Bitmap;
-                        for (int it_w = 0; it_w < m_W_count; ++it_w)
-                        {
-                            
-                            
-                            if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
-                            {
-                                m_w_file = "w" + it_w.ToString();
-                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y, ref image_x);
-                            }
-                            
-                        }
-                        image_x.Dispose();
-                        pictureBox1.Dispose();
-                        it_file++;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-                finally
-                {
-                    openFileDialog1.Multiselect = false;
+                    // Start the asynchronous operation.
+                    backgroundWorker_Autotrain.RunWorkerAsync();
                 }
             }
-
-            MessageBox.Show("Auto train success!");
+            MessageBox.Show("Auto train start!");
         }
 
         private bool ItemIsDouble(int it_item)
@@ -969,11 +930,12 @@ namespace perceptron_web_beeline
                 }
             }
         }
-        private void AutoAnswer(int it_w, out bool rez, out int sum, int max_y, ref Bitmap image_x)
+        
+        private void AutoAnswer(int it_w, out bool rez, out int sum, int max_x_62, int max_y, ref Bitmap image_x)
         {
 
-            int[,] input = new int[m_max_x_62, max_y];
-            Web_perceptron neyron = new Web_perceptron(m_max_x_62, max_y, input);
+            int[,] input = new int[max_x_62, max_y];
+            Web_perceptron neyron = new Web_perceptron(max_x_62, max_y, input);
 
             //*********************
             string line_read_weight_buffer;
@@ -986,7 +948,7 @@ namespace perceptron_web_beeline
                 {
 
                     str_weight_read_buffer = line_read_weight_buffer.Split(' ');
-                    for (int it_weight_x = 0; it_weight_x < m_max_x_62; it_weight_x++)
+                    for (int it_weight_x = 0; it_weight_x < max_x_62; it_weight_x++)
                     {
                         //listBox1.Items.Add("");
                         if (it_weight_y < max_y)
@@ -1014,7 +976,7 @@ namespace perceptron_web_beeline
            
             
 
-            for (var x = 0; x < m_max_x_62; x++)
+            for (var x = 0; x < max_x_62; x++)
             {
                 for (var y = 0; y < max_y; y++)
                 {
@@ -1101,7 +1063,7 @@ namespace perceptron_web_beeline
 
                             bool rez = false;
                             int sum = 0;
-                            AutoAnswer(max_y, out rez, out sum, max_y, ref image_x);
+                            AutoAnswer(max_y, out rez, out sum, m_max_x_62, max_y, ref image_x);
                             //if (rez)
                                 all_sum[it_w] = sum;
                         }
@@ -1155,6 +1117,60 @@ namespace perceptron_web_beeline
             }
 
             MessageBox.Show("Auto answer success!");
+        }
+
+        private void backgroundWorker_Autotrain_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+            int x_count = 62;
+            List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+            int max_y = 0;
+            for (int it_x = 0; it_x < x_count; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary.Add(new Dictonary_train(f_name));
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+            try
+            {
+                int it_file = 0;
+                foreach (string file in openFileDialog1.FileNames)
+                {
+                    //listBox1.Items.Add(file);
+                   // pictureBox1.Image = Image.FromFile(file);
+                    //pictureBox1.Load(file);
+                    Bitmap image_x = new Bitmap(file);
+                    for (int it_w = 0; it_w < m_W_count; ++it_w)
+                    {
+
+
+                        if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
+                        {
+                            m_w_file = "w" + it_w.ToString();
+                            AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y, ref image_x);
+                        }
+
+                    }
+                    image_x.Dispose();
+                    //pictureBox1.Dispose();
+                    it_file++;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+            }
+            finally
+            {
+                openFileDialog1.Multiselect = false;
+            }
+        }
+
+        private void backgroundWorker_Autotrain_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Auto train success!");
         }
 
     }
