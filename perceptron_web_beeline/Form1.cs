@@ -750,7 +750,7 @@ namespace perceptron_web_beeline
                 }
 
             }
-            image_x.Dispose();
+            //image_x.Dispose();
 
             neyron.mul_w();
             neyron.Sum();
@@ -823,10 +823,11 @@ namespace perceptron_web_beeline
                             if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                             {
                                 m_w_file = "w" + it_w.ToString();
-                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y);
+                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y);
                             }
                         }
                         pictureBox1.Dispose();
+                        it_file++;
                     }
                 }
                 catch (Exception ex)
