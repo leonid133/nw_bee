@@ -697,7 +697,8 @@ namespace perceptron_web_beeline
                         //listBox1.Items.Add("");
                         if (it_weight_y < max_y)
                         {
-                            neyron.m_weight[it_weight_x, it_weight_y] = Convert.ToInt32(str_weight_read_buffer[it_weight_x]); // Назначаем каждой связи её записанный ранее вес
+                            int _w = Convert.ToInt32(str_weight_read_buffer[it_weight_x].ToString());
+                            neyron.m_weight[it_weight_x, it_weight_y] = _w; // Назначаем каждой связи её записанный ранее вес
                             //listBox1.Items[k] += Convert.ToString(neyron.m_weight[i, k]); // Выводим веса, для наглядности
                         }
 
