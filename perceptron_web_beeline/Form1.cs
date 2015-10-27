@@ -675,7 +675,7 @@ namespace perceptron_web_beeline
             //recognize();
 
         }*/
-        private void AutoTrain(int it_w, string name_bmp, int max_y)
+        private void AutoTrain(int it_w, string name_bmp, int max_y, ref Bitmap image_x)
         {
             
             int[,] input = new int[m_max_x_62, max_y];
@@ -735,7 +735,8 @@ namespace perceptron_web_beeline
 
             
             //***********
-            Bitmap image_x = pictureBox1.Image as Bitmap;
+            
+            
 
             for (var x = 0; x < m_max_x_62; x++)
             {
@@ -750,8 +751,8 @@ namespace perceptron_web_beeline
                 }
 
             }
-            //image_x.Dispose();
 
+           // image_x.Dispose();
             neyron.mul_w();
             neyron.Sum();
             if ((neyron.Rez() && !train_to_this) || (!neyron.Rez() && train_to_this))
@@ -815,17 +816,21 @@ namespace perceptron_web_beeline
                     int it_file = 0;
                     foreach (string file in openFileDialog1.FileNames)
                     {
-                        pictureBox1.Image = Image.FromFile(file);
                         //listBox1.Items.Add(file);
-
+                        pictureBox1.Image = Image.FromFile(file);
+                        Bitmap image_x = pictureBox1.Image as Bitmap;
                         for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
+                            
+                            
                             if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                             {
                                 m_w_file = "w" + it_w.ToString();
-                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y);
+                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y, ref image_x);
                             }
+                            
                         }
+                        image_x.Dispose();
                         pictureBox1.Dispose();
                         it_file++;
                     }
