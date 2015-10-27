@@ -43,6 +43,7 @@
             this.button_CreateTestBMP = new System.Windows.Forms.Button();
             this.button_answer = new System.Windows.Forms.Button();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.backgroundWorker_Autotrain = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,7 +57,7 @@
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.ItemHeight = 16;
             this.listBox1.Location = new System.Drawing.Point(16, 134);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(4);
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(487, 292);
             this.listBox1.TabIndex = 0;
@@ -67,7 +68,7 @@
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.InitialImage = ((System.Drawing.Image)(resources.GetObject("pictureBox1.InitialImage")));
             this.pictureBox1.Location = new System.Drawing.Point(16, 15);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(104, 85);
             this.pictureBox1.TabIndex = 2;
@@ -76,7 +77,7 @@
             // button_open
             // 
             this.button_open.Location = new System.Drawing.Point(271, 15);
-            this.button_open.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_open.Margin = new System.Windows.Forms.Padding(4);
             this.button_open.Name = "button_open";
             this.button_open.Size = new System.Drawing.Size(100, 28);
             this.button_open.TabIndex = 3;
@@ -87,7 +88,7 @@
             // button_train
             // 
             this.button_train.Location = new System.Drawing.Point(403, 14);
-            this.button_train.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_train.Margin = new System.Windows.Forms.Padding(4);
             this.button_train.Name = "button_train";
             this.button_train.Size = new System.Drawing.Size(100, 28);
             this.button_train.TabIndex = 4;
@@ -98,7 +99,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(143, 50);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 28);
             this.button1.TabIndex = 5;
@@ -109,7 +110,7 @@
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(271, 50);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(100, 28);
             this.button2.TabIndex = 6;
@@ -120,7 +121,7 @@
             // button_NeyroActivate
             // 
             this.button_NeyroActivate.Location = new System.Drawing.Point(143, 15);
-            this.button_NeyroActivate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_NeyroActivate.Margin = new System.Windows.Forms.Padding(4);
             this.button_NeyroActivate.Name = "button_NeyroActivate";
             this.button_NeyroActivate.Size = new System.Drawing.Size(100, 28);
             this.button_NeyroActivate.TabIndex = 7;
@@ -131,7 +132,7 @@
             // button_AutoTrain
             // 
             this.button_AutoTrain.Location = new System.Drawing.Point(403, 49);
-            this.button_AutoTrain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_AutoTrain.Margin = new System.Windows.Forms.Padding(4);
             this.button_AutoTrain.Name = "button_AutoTrain";
             this.button_AutoTrain.Size = new System.Drawing.Size(100, 28);
             this.button_AutoTrain.TabIndex = 8;
@@ -161,7 +162,7 @@
             // button_CreateTestBMP
             // 
             this.button_CreateTestBMP.Location = new System.Drawing.Point(143, 87);
-            this.button_CreateTestBMP.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_CreateTestBMP.Margin = new System.Windows.Forms.Padding(4);
             this.button_CreateTestBMP.Name = "button_CreateTestBMP";
             this.button_CreateTestBMP.Size = new System.Drawing.Size(100, 28);
             this.button_CreateTestBMP.TabIndex = 10;
@@ -172,7 +173,7 @@
             // button_answer
             // 
             this.button_answer.Location = new System.Drawing.Point(271, 87);
-            this.button_answer.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_answer.Margin = new System.Windows.Forms.Padding(4);
             this.button_answer.Name = "button_answer";
             this.button_answer.Size = new System.Drawing.Size(100, 28);
             this.button_answer.TabIndex = 11;
@@ -185,6 +186,11 @@
             this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth4Bit;
             this.imageList1.ImageSize = new System.Drawing.Size(85, 104);
             this.imageList1.TransparentColor = System.Drawing.Color.White;
+            // 
+            // backgroundWorker_Autotrain
+            // 
+            this.backgroundWorker_Autotrain.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_Autotrain_DoWork);
+            this.backgroundWorker_Autotrain.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_Autotrain_RunWorkerCompleted);
             // 
             // Form1
             // 
@@ -202,7 +208,7 @@
             this.Controls.Add(this.button_open);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.listBox1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -226,6 +232,7 @@
         private System.Windows.Forms.Button button_CreateTestBMP;
         private System.Windows.Forms.Button button_answer;
         private System.Windows.Forms.ImageList imageList1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_Autotrain;
     }
 }
 
