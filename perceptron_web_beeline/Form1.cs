@@ -1060,9 +1060,7 @@ namespace perceptron_web_beeline
                     string name_answer_file = "sol";
 
                     System.IO.File.Delete(name_answer_file);
-                    FileStream sol_FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
-                    StreamWriter sol_SW = new StreamWriter(sol_FS);
-
+                    
                     int it_file = 0;
                     foreach (string file in openFileDialog1.FileNames)
                     {
@@ -1116,11 +1114,16 @@ namespace perceptron_web_beeline
                         }
                         rez_nw_list[bmp_file_suffix] = answer;
                         string s = bmp_file_suffix + "," + rez_nw_list[bmp_file_suffix];
-                        
+
+                        FileStream sol_FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
+                        sol_FS.Position = sol_FS.Length;
+                        StreamWriter sol_SW = new StreamWriter(sol_FS);
+                       // sol_SW.AutoFlush = true;
+
                         sol_SW.WriteLine(s);
-                        //sol_SW.Flush();
+                        sol_SW.Close();
                     }
-                    sol_SW.Close();
+                    
                     /*
                     string name_answer_file = "sol";
                     openFileDialog1.Multiselect = false;
