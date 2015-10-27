@@ -1005,118 +1005,15 @@ namespace perceptron_web_beeline
             openFileDialog1.Multiselect = true;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                Dictonary_train y_dictonary = new Dictonary_train("y");
-                int x_count = 62;
-                List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
-                int max_y = 0;
-                for (int it_x = 0; it_x < x_count; ++it_x)
+                if (backgroundWorker_Answer.IsBusy != true)
                 {
-                    string f_name = "x" + it_x.ToString();
-                    x_dictonary.Add(new Dictonary_train(f_name));
-                    if (x_dictonary[it_x].Count() > max_y)
-                        max_y = x_dictonary[it_x].Count();
+                    // Start the asynchronous operation.
+                    backgroundWorker_Answer.RunWorkerAsync();
                 }
-                try
-                {
-                    List<int> rez_nw_list = new List<int>();
-                    for (int i = 0; i < m_max_id; ++i)
-                    {
-                        rez_nw_list.Add(0);
-                    }
-
-                    string name_answer_file = "sol";
-
-                    System.IO.File.Delete(name_answer_file);
-                    
-                    int it_file = 0;
-                    foreach (string file in openFileDialog1.FileNames)
-                    {
-                        //***********
-                        char[] bmp_filename_charSeparators = new char[] { '_' };
-                        string name_bmp = openFileDialog1.SafeFileNames[it_file++].ToString();
-                        string[] result_split_bmp = name_bmp.Split(bmp_filename_charSeparators, StringSplitOptions.None);
-                        int bmp_file_preffix = 0;
-                        int bmp_file_suffix = 0;
-                        for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
-                        {
-                            try
-                            {
-                                if (it_bmp_split_name == 0)
-                                    bmp_file_preffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
-                                else if (it_bmp_split_name == 2)
-                                    bmp_file_suffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
-                            }
-                            catch { }
-                        }
-
-                        //***********
-                        //listBox1.Items.Add(file);
-
-                        pictureBox1.Image = Image.FromFile(file);
-                        Bitmap image_x = pictureBox1.Image as Bitmap;
-                        int[] all_sum = new int[8];
-
-                        for (int it_w = 0; it_w < m_W_count; ++it_w)
-                        {
-                            all_sum[it_w] = 0;
-                            m_w_file = "w" + it_w.ToString();
-
-                            bool rez = false;
-                            int sum = 0;
-                            AutoAnswer(max_y, out rez, out sum, m_max_x_62, max_y, ref image_x);
-                            //if (rez)
-                                all_sum[it_w] = sum;
-                        }
-                        image_x.Dispose();
-                        pictureBox1.Dispose();
-                        int maxsum = all_sum[0];
-                        int answer = 0;
-                        for (int it_w = 0; it_w < m_W_count; ++it_w)
-                        {
-                            if (all_sum[it_w] > maxsum)
-                            {
-                                maxsum = all_sum[it_w];
-                                answer = it_w;
-                            }
-                        }
-                        rez_nw_list[bmp_file_suffix] = answer;
-                        string s = bmp_file_suffix + "," + rez_nw_list[bmp_file_suffix];
-
-                        FileStream sol_FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
-                        sol_FS.Position = sol_FS.Length;
-                        StreamWriter sol_SW = new StreamWriter(sol_FS);
-                       // sol_SW.AutoFlush = true;
-
-                        sol_SW.WriteLine(s);
-                        sol_SW.Close();
-                    }
-                    
-                    /*
-                    string name_answer_file = "sol";
-                    openFileDialog1.Multiselect = false;
-                    System.IO.File.Delete(name_answer_file);
-                    FileStream FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
-                    StreamWriter SW = new StreamWriter(FS);
-
-                    for (int it_id = 0; it_id < m_max_id; it_id++)
-                    {
-                        string s = it_id + "," + rez_nw_list[it_id]; 
-                        SW.WriteLine(s);
-                    }
-                     * */
-                    
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
-                }
-                finally
-                {
-                    openFileDialog1.Multiselect = false;
-                }
+                
             }
 
-            MessageBox.Show("Auto answer success!");
+            MessageBox.Show("Auto answer start success!");
         }
 
         private void backgroundWorker_Autotrain_DoWork(object sender, DoWorkEventArgs e)
@@ -1171,6 +1068,125 @@ namespace perceptron_web_beeline
         private void backgroundWorker_Autotrain_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             MessageBox.Show("Auto train success!");
+        }
+
+        private void backgroundWorker_Answer_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+            Dictonary_train y_dictonary = new Dictonary_train("y");
+            int x_count = 62;
+            List<Dictonary_train> x_dictonary = new List<Dictonary_train>();
+            int max_y = 0;
+            for (int it_x = 0; it_x < x_count; ++it_x)
+            {
+                string f_name = "x" + it_x.ToString();
+                x_dictonary.Add(new Dictonary_train(f_name));
+                if (x_dictonary[it_x].Count() > max_y)
+                    max_y = x_dictonary[it_x].Count();
+            }
+            try
+            {
+                List<int> rez_nw_list = new List<int>();
+                for (int i = 0; i < m_max_id; ++i)
+                {
+                    rez_nw_list.Add(0);
+                }
+
+                string name_answer_file = "sol";
+
+                System.IO.File.Delete(name_answer_file);
+
+                int it_file = 0;
+                foreach (string file in openFileDialog1.FileNames)
+                {
+                    //***********
+                    char[] bmp_filename_charSeparators = new char[] { '_' };
+                    string name_bmp = openFileDialog1.SafeFileNames[it_file++].ToString();
+                    string[] result_split_bmp = name_bmp.Split(bmp_filename_charSeparators, StringSplitOptions.None);
+                    int bmp_file_preffix = 0;
+                    int bmp_file_suffix = 0;
+                    for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
+                    {
+                        try
+                        {
+                            if (it_bmp_split_name == 0)
+                                bmp_file_preffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
+                            else if (it_bmp_split_name == 2)
+                                bmp_file_suffix = Int32.Parse(result_split_bmp[it_bmp_split_name]);
+                        }
+                        catch { }
+                    }
+
+                    //***********
+                    //listBox1.Items.Add(file);
+
+
+                    Bitmap image_x = new Bitmap(file);
+                    int[] all_sum = new int[8];
+
+                    for (int it_w = 0; it_w < m_W_count; ++it_w)
+                    {
+                        all_sum[it_w] = 0;
+                        m_w_file = "w" + it_w.ToString();
+
+                        bool rez = false;
+                        int sum = 0;
+                        AutoAnswer(max_y, out rez, out sum, m_max_x_62, max_y, ref image_x);
+                        //if (rez)
+                        all_sum[it_w] = sum;
+                    }
+                    image_x.Dispose();
+                    //pictureBox1.Dispose();
+                    int maxsum = all_sum[0];
+                    int answer = 0;
+                    for (int it_w = 0; it_w < m_W_count; ++it_w)
+                    {
+                        if (all_sum[it_w] > maxsum)
+                        {
+                            maxsum = all_sum[it_w];
+                            answer = it_w;
+                        }
+                    }
+                    rez_nw_list[bmp_file_suffix] = answer;
+                    string s = bmp_file_suffix + "," + rez_nw_list[bmp_file_suffix];
+
+                    FileStream sol_FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
+                    sol_FS.Position = sol_FS.Length;
+                    StreamWriter sol_SW = new StreamWriter(sol_FS);
+                    // sol_SW.AutoFlush = true;
+
+                    sol_SW.WriteLine(s);
+                    sol_SW.Close();
+                }
+
+                /*
+                string name_answer_file = "sol";
+                openFileDialog1.Multiselect = false;
+                System.IO.File.Delete(name_answer_file);
+                FileStream FS = new FileStream(name_answer_file, FileMode.OpenOrCreate);
+                StreamWriter SW = new StreamWriter(FS);
+
+                for (int it_id = 0; it_id < m_max_id; it_id++)
+                {
+                    string s = it_id + "," + rez_nw_list[it_id]; 
+                    SW.WriteLine(s);
+                }
+                 * */
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+            }
+            finally
+            {
+                openFileDialog1.Multiselect = false;
+            }
+        }
+
+        private void backgroundWorker_Answer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Answer success!");
         }
 
     }
