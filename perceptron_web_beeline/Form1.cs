@@ -24,6 +24,8 @@ namespace perceptron_web_beeline
         public string m_w_file;
         public int m_max_x_62 = 62;
         public int m_max_id = 50000;
+        public int m_W_count = 7;
+
         public Form1()
         {
             InitializeComponent();
@@ -140,7 +142,8 @@ namespace perceptron_web_beeline
                         
                         if (k < max_y)
                         {
-                            g_Neyron.m_weight[i, k] = Convert.ToInt32(s1[i]); // Назначаем каждой связи её записанный ранее вес
+                            int _w = Convert.ToInt32(s1[i].ToString());
+                            g_Neyron.m_weight[i, k] =_w; // Назначаем каждой связи её записанный ранее вес
                             listBox1.Items[k] += Convert.ToString(g_Neyron.m_weight[i, k]); // Выводим веса, для наглядности
                         }
 
@@ -694,7 +697,8 @@ namespace perceptron_web_beeline
                         //listBox1.Items.Add("");
                         if (it_weight_y < max_y)
                         {
-                            neyron.m_weight[it_weight_x, it_weight_y] = Convert.ToInt32(str_weight_read_buffer[it_weight_x]); // Назначаем каждой связи её записанный ранее вес
+                            int _w = Convert.ToInt32(str_weight_read_buffer[it_weight_x].ToString());
+                            neyron.m_weight[it_weight_x, it_weight_y] = _w; // Назначаем каждой связи её записанный ранее вес
                             //listBox1.Items[k] += Convert.ToString(neyron.m_weight[i, k]); // Выводим веса, для наглядности
                         }
 
@@ -746,7 +750,7 @@ namespace perceptron_web_beeline
                 }
 
             }
-            image_x.Dispose();
+            //image_x.Dispose();
 
             neyron.mul_w();
             neyron.Sum();
@@ -808,21 +812,22 @@ namespace perceptron_web_beeline
                 }
                 try
                 {
-                    for (int it_w = 0; it_w < 8; ++it_w)
+                    int it_file = 0;
+                    foreach (string file in openFileDialog1.FileNames)
                     {
-                        if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
+                        pictureBox1.Image = Image.FromFile(file);
+                        //listBox1.Items.Add(file);
+
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
-                            int it_file = 0;
-                            foreach (string file in openFileDialog1.FileNames)
+                            if (it_w <= checkedListBox1.Items.Count && checkedListBox1.GetItemChecked(it_w))
                             {
-                                //listBox1.Items.Add(file);
                                 m_w_file = "w" + it_w.ToString();
-                                pictureBox1.Image = Image.FromFile(file);
-                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file++].ToString(), max_y);
-                                pictureBox1.Dispose();
-                                pictureBox1.Dispose();
+                                AutoTrain(it_w, openFileDialog1.SafeFileNames[it_file].ToString(), max_y);
                             }
                         }
+                        pictureBox1.Dispose();
+                        it_file++;
                     }
                 }
                 catch (Exception ex)
@@ -981,7 +986,9 @@ namespace perceptron_web_beeline
                         //listBox1.Items.Add("");
                         if (it_weight_y < max_y)
                         {
-                            neyron.m_weight[it_weight_x, it_weight_y] = Convert.ToInt32(str_weight_read_buffer[it_weight_x]); // Назначаем каждой связи её записанный ранее вес
+                            int _w = Convert.ToInt32(str_weight_read_buffer[it_weight_x].ToString());
+                            neyron.m_weight[it_weight_x, it_weight_y] = _w;
+                            //neyron.m_weight[it_weight_x, it_weight_y] = Convert.ToInt32(str_weight_read_buffer[it_weight_x]); // Назначаем каждой связи её записанный ранее вес
                             //listBox1.Items[k] += Convert.ToString(neyron.m_weight[i, k]); // Выводим веса, для наглядности
                         }
 
@@ -1067,7 +1074,6 @@ namespace perceptron_web_beeline
                         int bmp_file_suffix = 0;
                         for (int it_bmp_split_name = 0; it_bmp_split_name < result_split_bmp.Count(); ++it_bmp_split_name)
                         {
-
                             try
                             {
                                 if (it_bmp_split_name == 0)
@@ -1085,7 +1091,7 @@ namespace perceptron_web_beeline
                         Bitmap image_x = pictureBox1.Image as Bitmap;
                         int[] all_sum = new int[8];
 
-                        for (int it_w = 0; it_w < 6; ++it_w)
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
                             all_sum[it_w] = 0;
                             m_w_file = "w" + it_w.ToString();
@@ -1100,7 +1106,7 @@ namespace perceptron_web_beeline
                         pictureBox1.Dispose();
                         int maxsum = all_sum[0];
                         int answer = 0;
-                        for (int it_w = 0; it_w < 8; ++it_w)
+                        for (int it_w = 0; it_w < m_W_count; ++it_w)
                         {
                             if (all_sum[it_w] > maxsum)
                             {
