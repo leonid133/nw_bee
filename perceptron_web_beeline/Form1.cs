@@ -1131,7 +1131,7 @@ namespace perceptron_web_beeline
 
                         bool rez = false;
                         int sum = 0;
-                        AutoAnswer(max_y, out rez, out sum, m_max_x_62, max_y, ref image_x);
+                                AutoAnswer(max_y, out rez, out sum, m_max_x_62, max_y, ref image_x);
                         //if (rez)
                         all_sum[it_w] = sum;
                     }
