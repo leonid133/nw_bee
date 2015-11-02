@@ -843,7 +843,7 @@ namespace perceptron_web_beeline
 
                 string str_write_weight_buffer = "";
 
-                //System.IO.File.Delete(m_w_file);
+                System.IO.File.Delete(m_w_file);
                 FileStream fs_weight_writer = new FileStream(m_w_file, FileMode.OpenOrCreate);
                 StreamWriter sw_weight_writer = new StreamWriter(fs_weight_writer);
 
